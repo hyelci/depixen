@@ -7,10 +7,11 @@ import { collection, addDoc, getDocs } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 import { db, storage } from "./firebase";
+import { EditableInput } from "./components/EditableInput";
 
 const initialState = {
-  inputName: "",
-  description: "",
+  inputName: "New Title",
+  description: "New Description",
 };
 
 function App() {
@@ -67,8 +68,8 @@ function App() {
       description: description,
       image: imageUrl,
     });
-    setInputName("");
-    setDescription("");
+    setInputName(initialState.inputName);
+    setDescription(initialState.description);
     setSelectedImage(null);
     console.log("Document written with ID: ", docRef.id);
     await fetchPost();
@@ -95,26 +96,23 @@ function App() {
 
         <div className="form-content">
           <div>
-            <input
+            <EditableInput
               type="text"
               name="name"
               placeholder="New title"
               value={inputName}
-              className="name-input"
               onChange={(e) => setInputName(e.target.value)}
             />
           </div>
 
           <div>
-            <textarea
-              rows="6"
-              cols="20"
+            <EditableInput
+              isTextArea={true}
               name="description"
               placeholder="New description"
               onChange={(e) => setDescription(e.target.value)}
               value={description}
-              className="text-area"
-            ></textarea>
+            />
           </div>
 
           <div>
@@ -128,8 +126,6 @@ function App() {
                 <br />
               </div>
             )}
-
-            <br />
 
             {!selectedImage && (
               <div
@@ -148,24 +144,23 @@ function App() {
               accept="image/png, image/gif, image/jpeg"
               style={{ display: "none" }}
               onChange={(event) => {
-                console.log(event.target.files[0]);
                 setSelectedImage(event.target.files[0]);
               }}
             />
-            <div className="icon-button">
-              <IconButton aria-label="create" type="submit">
-                <SquareIcon
-                  color={isAddButtonActive ? "success" : "disabled"}
-                ></SquareIcon>
-              </IconButton>
-            </div>
+          </div>
+          <div className="icon-button">
+            <IconButton aria-label="create" type="submit">
+              <SquareIcon
+                color={isAddButtonActive ? "success" : "disabled"}
+              ></SquareIcon>
+            </IconButton>
           </div>
         </div>
       </form>
 
       {cardList.map((card) => {
         return (
-          <div>
+          <div key={card.id}>
             <p className="title">{card.title}</p>
             <div className="form-content">
               <p>{card.description}</p>
