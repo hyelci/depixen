@@ -1,13 +1,14 @@
 import "./App.css";
 import { useState, useRef, useEffect } from "react";
 import SquareIcon from "@mui/icons-material/Square";
-import PlusIcon from "@mui/icons-material/Add";
-import { IconButton } from "@mui/material";
+import { Grid, IconButton } from "@mui/material";
 import { collection, addDoc, getDocs } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 import { db, storage } from "./firebase";
 import { EditableInput } from "./components/EditableInput";
+import Card from "./components/Card";
+import ImagePicker from "./components/ImagePicker";
 
 const initialState = {
   inputName: "New Title",
@@ -21,7 +22,6 @@ function App() {
   const [isAddButtonActive, setIsAddButtonActive] = useState(false);
   const [cardList, setCardList] = useState([]);
   const [percent, setPercent] = useState(0);
-  const fileInput = useRef();
 
   useEffect(() => {
     if (inputName && description && selectedImage) {
@@ -115,39 +115,11 @@ function App() {
             />
           </div>
 
-          <div>
-            {selectedImage && (
-              <div>
-                <img
-                  className="image"
-                  alt="selected image"
-                  src={URL.createObjectURL(selectedImage)}
-                />
-                <br />
-              </div>
-            )}
+          <ImagePicker
+            selectedImage={selectedImage}
+            setSelectedImage={setSelectedImage}
+          />
 
-            {!selectedImage && (
-              <div
-                className="image-picker"
-                onClick={() => fileInput.current.click()}
-              >
-                <PlusIcon sx={{ fontSize: 60 }} />
-                <p className="image-text">IMAGE</p>
-              </div>
-            )}
-
-            <input
-              type="file"
-              ref={fileInput}
-              name="myImage"
-              accept="image/png, image/gif, image/jpeg"
-              style={{ display: "none" }}
-              onChange={(event) => {
-                setSelectedImage(event.target.files[0]);
-              }}
-            />
-          </div>
           <div className="icon-button">
             <IconButton aria-label="create" type="submit">
               <SquareIcon
@@ -158,17 +130,15 @@ function App() {
         </div>
       </form>
 
-      {cardList.map((card) => {
-        return (
-          <div key={card.id}>
-            <p className="title">{card.title}</p>
-            <div className="form-content">
-              <p>{card.description}</p>
-              <img className="image" src={card.image} />
-            </div>
-          </div>
-        );
-      })}
+      <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+        {cardList.map((card) => {
+          return (
+            <Grid item xs={12} sm={6} md={4} lg={3} key={card.id}>
+              <Card card={card} />
+            </Grid>
+          );
+        })}
+      </Grid>
     </div>
   );
 }
